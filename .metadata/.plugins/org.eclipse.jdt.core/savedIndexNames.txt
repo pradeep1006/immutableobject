@@ -1,0 +1,2 @@
+INDEX VERSION 1.130+C:\paypay\.metadata\.plugins\org.eclipse.jdt.core
+706576440.index

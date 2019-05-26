@@ -1,0 +1,111 @@
+package com.asif.immutable; 
+2 
+ 
+3 /** 
+4  * This class is the concrete class that represents an Immutable Queue. 
+5  * <p> 
+6  * This uses two stacks <b>forwards</b> and <b>backwards</b> to keep track of the elements. 
+7  * The <b>backwards</b> stack keeps track of the elements being enQueued (since a queue is like a reverse stack). 
+8  * The <b>forwards</b> stack keeps track of the elements being deQueued. 
+9  * The operations enQueue(), head() and isEmpty() runs in constant, i.e.,O(1) time. 
+10  * The deQueue() operation runs in O(n) time in worst case and O(1) time in best case. The worst case O(n) 
+11  * time arises since that could involve reversing of the full <b>forwards</b> stack.  
+12  * </p> 
+13  * @author asifiqbal 
+14  * 
+15  * @param <T> generic type for the elemets of the queue 
+16  */ 
+17 public final class ImmutableQueue<T> implements Queue<T>{ 
+18 	 
+19 	private final Stack<T> backwards; 
+20     private final Stack<T> forwards; 
+21       
+22     private ImmutableQueue(Stack<T> forwards, Stack<T> backwards) 
+23     { 
+24         this.forwards = forwards; 
+25         this.backwards = backwards; 
+26     } 
+27      
+28     /** 
+29      * Reverses the provided stack. 
+30      * @param stack 
+31      * @return 
+32      * @throws Exception 
+33      */ 
+34 	@SuppressWarnings({ "unchecked", "rawtypes" }) 
+35 	public final static Stack reverseStack(Stack stack) throws Exception 
+36     { 
+37         Stack r = ImmutableStack.getEmptyStack(); 
+38         while(!stack.isEmpty()){ 
+39         	r = r.push(stack.head());    
+40         	stack = stack.pop(); 
+41         } 
+42        
+43         return r; 
+44     } 
+45 	 
+46 	@SuppressWarnings({ "rawtypes" }) 
+47 	public final static Queue getEmptyQueue(){ 
+48 		return EmptyQueue.getInstance(); 
+49 	} 
+50 	 
+51 	public final Queue<T> enQueue(T t){ 
+52 		return new ImmutableQueue<T>(forwards, backwards.push(t)); 
+53 	} 
+54 	 
+55 	@SuppressWarnings("unchecked") 
+56 	public final Queue<T> deQueue() throws Exception{ 
+57 		Stack<T> f = forwards.pop(); 
+58         if (!f.isEmpty()){ 
+59             return new ImmutableQueue<T>(f, backwards); 
+60         } 
+61         else if (backwards.isEmpty()){ 
+62             return ImmutableQueue.getEmptyQueue(); 
+63         } 
+64         else { 
+65             return new ImmutableQueue<T>(ImmutableQueue.reverseStack(backwards), ImmutableStack.getEmptyStack()); 
+66         } 
+67 	} 
+68 	 
+69 	public final T head() throws Exception{ 
+70 		return forwards.head(); 
+71 	} 
+72 	 
+73 	public final boolean isEmpty(){ 
+74 		return false; 
+75 	} 
+76 	 
+77 	/** 
+78 	 * Represents an empty queue. This is a singleton. 
+79 	 * @author asifiqbal 
+80 	 * 
+81 	 * @param <T> 
+82 	 */ 
+83 	private static final class EmptyQueue<T> implements Queue<T>{ 
+84 		 
+85 		@SuppressWarnings("rawtypes") 
+86 		private final static EmptyQueue emptyQueue = new EmptyQueue(); 
+87 		 
+88 		@SuppressWarnings("rawtypes") 
+89 		public final static EmptyQueue getInstance(){ 
+90 			return emptyQueue; 
+91 		} 
+92 		 
+93 		@SuppressWarnings("unchecked") 
+94 		public final Queue<T> enQueue(T t){ 
+95 			return new ImmutableQueue<T>(ImmutableStack.getEmptyStack().push(t), ImmutableStack.getEmptyStack()); 
+96 		} 
+97 		 
+98 		public final Queue<T> deQueue() throws Exception{ 
+99 			throw new Exception("Queue is empty."); 
+100 		} 
+101 		 
+102 		public final T head() throws Exception{ 
+103 			throw new Exception("Queue is empty."); 
+104 		} 
+105 		 
+106 		public final boolean isEmpty(){ 
+107 			return true; 
+108 		} 
+109 	} 
+110 } 
